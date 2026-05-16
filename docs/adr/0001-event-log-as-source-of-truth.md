@@ -1,0 +1,3 @@
+# Event log as source of truth
+
+Scorekeepr stores scored games as ordered **Game Events** and derives **Game State** and **Projections** from the active event history. This was chosen over directly storing mutable game state because baseball scorekeeping requires reliable undo/edit behavior, replayable scorebook cells, recalculated stats, and correction of earlier plays that can affect all later state. Corrections append **Correction Events** rather than mutating prior events, and replacement events replay at the replaced event's **Effective Sequence** while preserving when the correction was actually recorded.
