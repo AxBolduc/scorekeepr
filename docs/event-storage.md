@@ -288,7 +288,8 @@ Replay should use active events only:
 
 - Include normal events that have not been voided or replaced.
 - Include replacement events at their effective sequence.
-- Exclude `GAME_EVENT_VOIDED` / `GAME_EVENT_CORRECTED` from baseball state if they are metadata-only, while using their relationships to determine active history.
+- Consume structured `voids_event_id` / `replaces_event_id` relationships before projection.
+- Exclude `GAME_EVENT_VOIDED` / `GAME_EVENT_CORRECTED` metadata events from baseball Game State projection while preserving them in full history.
 
 Conceptual query shape:
 
@@ -311,7 +312,7 @@ where e.game_id = $1
 order by e.effective_sequence, e.recorded_sequence;
 ```
 
-The final query may need to handle metadata events explicitly depending on replay implementation.
+The Active Event Resolver is the replay-facing preprocessor. It returns only active events for Game State and Projection code: original events referenced by void/replacement relationships are excluded, correction metadata events are excluded from baseball state, and remaining active events are ordered by `(effective_sequence, recorded_sequence)` so replacement events can share the replaced event's Effective Sequence deterministically.
 
 ---
 
@@ -360,7 +361,7 @@ All events in the batch share the same `command_id`.
 User-scoring append requests include:
 
 ```ts
-expectedLastRecordedSequence: number
+expectedLastRecordedSequence: number;
 ```
 
 If the current game stream has advanced beyond that sequence, the append is rejected and the client must reload/reconcile.
@@ -368,10 +369,10 @@ If the current game stream has advanced beyond that sequence, the append is reje
 ### Transaction outline
 
 1. Begin transaction.
-2. Acquire per-game append lock.
-   - Option: lock the `games` row.
-   - Option: lock a dedicated game stream metadata row.
-   - Option: PostgreSQL advisory lock keyed by `game_id`.
+2. Acquire a PostgreSQL transaction-scoped advisory lock keyed by `game_id`.
+   - This is the MVP default per-game append lock.
+   - The lock is held only for the append transaction and protects current-version checks plus Recorded Sequence assignment.
+   - Clients still never assign sequence values.
 3. Check current last recorded sequence.
 4. Compare to `expectedLastRecordedSequence` for user commands.
 5. Validate event payloads in application code.
@@ -396,6 +397,7 @@ Rules:
 - A command may produce multiple events.
 - `game_events.command_id` links each event to the accepted command.
 - MVP stores successful commands only.
+- Failed validation attempts and stale expected-version attempts are returned as errors and are not persisted in the MVP command table.
 
 ---
 
@@ -477,8 +479,11 @@ Because game event streams are expected to be manageable initially, full replay 
 
 ## Open Questions
 
-1. Which per-game append locking mechanism should be used: `games` row lock, stream metadata row, or advisory lock?
-2. Should replay exclude correction metadata events by type, or should those events be interpreted by a preprocessor that builds the active event list?
-3. Should `game_event_commands` eventually store failed/stale command attempts for audit/debugging?
-4. When persisted projections are added, should they update synchronously in the append transaction or asynchronously after commit?
-5. Should archived/finalized games get compacted exports or remain only as event streams plus rebuildable projections?
+1. When persisted projections are added, should they update synchronously in the append transaction or asynchronously after commit?
+2. Should archived/finalized games get compacted exports or remain only as event streams plus rebuildable projections?
+
+Resolved for MVP:
+
+- Per-game append locking uses a PostgreSQL transaction-scoped advisory lock keyed by `game_id`.
+- Active replay uses an Active Event Resolver preprocessor that consumes structured correction relationships, excludes correction metadata from baseball Game State projection, and sorts by `(effective_sequence, recorded_sequence)`.
+- `game_event_commands` stores successful commands only; failed/stale command attempts are returned as errors and not persisted for MVP.
