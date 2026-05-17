@@ -48,6 +48,50 @@ export type GameEventType = typeof GameEventType.Type;
 
 export type ActorType = "user" | "system" | "import";
 
+export const PitchResult = Schema.Literals([
+  "ball",
+  "called_strike",
+  "swinging_strike",
+  "foul",
+  "foul_tip",
+  "hit_by_pitch",
+  "ball_in_play",
+] as const);
+export type PitchResult = typeof PitchResult.Type;
+
+export const PitchRecordedPayload = Schema.Struct({
+  pitcherId: Schema.String,
+  batterId: Schema.String,
+  lineupSpotId: Schema.String,
+  result: PitchResult,
+});
+export type PitchRecordedPayload = typeof PitchRecordedPayload.Type;
+
+export const validateGameEventPayload = (
+  type: GameEventType,
+  payloadSchemaVersion: number,
+  payload: unknown,
+): { ok: true; payload: unknown } | { ok: false; error: string } => {
+  if (type !== "PITCH_RECORDED") {
+    return { ok: false, error: `Unsupported Game Event type: ${type}` };
+  }
+
+  if (payloadSchemaVersion !== 1) {
+    return {
+      ok: false,
+      error: `Unsupported payload schema version for PITCH_RECORDED: ${payloadSchemaVersion}`,
+    };
+  }
+
+  const result = Schema.decodeUnknownResult(PitchRecordedPayload)(payload);
+
+  if (result._tag === "Failure") {
+    return { ok: false, error: "Invalid PITCH_RECORDED payload" };
+  }
+
+  return { ok: true, payload: result.success };
+};
+
 export type StoredGameEvent = {
   id: string;
   gameId: string;

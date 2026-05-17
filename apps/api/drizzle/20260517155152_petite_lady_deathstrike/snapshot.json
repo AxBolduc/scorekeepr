@@ -1,0 +1,717 @@
+{
+  "version": "8",
+  "dialect": "postgres",
+  "id": "a69eba44-708a-4493-9796-3d724c9d2b76",
+  "prevIds": ["00000000-0000-0000-0000-000000000000"],
+  "ddl": [
+    {
+      "isRlsEnabled": false,
+      "name": "game_event_commands",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "game_events",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "games",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "users",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "game_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "status",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expected_last_recorded_sequence",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "first_recorded_sequence",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "last_recorded_sequence",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "requested_by_actor_type",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "requested_by_user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "requested_by_role",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "completed_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "bigint",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": {
+        "type": "always",
+        "name": "game_events_global_sequence_seq",
+        "increment": "1",
+        "startWith": "1",
+        "minValue": "1",
+        "maxValue": "9223372036854775807",
+        "cache": 1,
+        "cycle": false
+      },
+      "name": "global_sequence",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "game_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "command_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "type",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "1",
+      "generated": null,
+      "identity": null,
+      "name": "payload_schema_version",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "payload",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "recorded_sequence",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "effective_sequence",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "replaces_event_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "voids_event_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "recorded_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "recorded_by_actor_type",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "recorded_by_user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "recorded_by_role",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "games"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "game_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "recorded_sequence",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "game_events_game_recorded_sequence_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "game_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "effective_sequence",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "recorded_sequence",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "game_events_game_effective_sequence_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "game_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "type",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "game_events_game_type_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "replaces_event_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "game_events_replaces_event_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "voids_event_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "game_events_voids_event_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "command_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "game_events_command_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["game_id"],
+      "schemaTo": "public",
+      "tableTo": "games",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "game_event_commands_game_id_games_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["requested_by_user_id"],
+      "schemaTo": "public",
+      "tableTo": "users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "game_event_commands_requested_by_user_id_users_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["game_id"],
+      "schemaTo": "public",
+      "tableTo": "games",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "game_events_game_id_games_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["command_id"],
+      "schemaTo": "public",
+      "tableTo": "game_event_commands",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "game_events_command_id_game_event_commands_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["recorded_by_user_id"],
+      "schemaTo": "public",
+      "tableTo": "users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "game_events_recorded_by_user_id_users_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "game_event_commands_pkey",
+      "schema": "public",
+      "table": "game_event_commands",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "game_events_pkey",
+      "schema": "public",
+      "table": "game_events",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "games_pkey",
+      "schema": "public",
+      "table": "games",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "users_pkey",
+      "schema": "public",
+      "table": "users",
+      "entityType": "pks"
+    },
+    {
+      "nameExplicit": true,
+      "columns": ["game_id", "id"],
+      "nullsNotDistinct": false,
+      "name": "game_event_commands_game_id_id_unique",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "nameExplicit": true,
+      "columns": ["game_id", "recorded_sequence"],
+      "nullsNotDistinct": false,
+      "name": "game_events_recorded_sequence_unique",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "value": "\"status\" in ('completed')",
+      "name": "game_event_commands_status_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "value": "\"requested_by_actor_type\" in ('user', 'system', 'import')",
+      "name": "game_event_commands_actor_type_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "value": "(\"requested_by_actor_type\" = 'user' and \"requested_by_user_id\" is not null) or (\"requested_by_actor_type\" <> 'user')",
+      "name": "game_event_commands_user_actor_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "game_event_commands"
+    },
+    {
+      "value": "\"recorded_by_actor_type\" in ('user', 'system', 'import')",
+      "name": "game_events_actor_type_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "value": "(\"recorded_by_actor_type\" = 'user' and \"recorded_by_user_id\" is not null) or (\"recorded_by_actor_type\" <> 'user')",
+      "name": "game_events_user_actor_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "game_events"
+    },
+    {
+      "value": "\"type\" in (\n        'GAME_CREATED',\n        'GAME_RULES_RECORDED',\n        'GAME_RULES_CHANGED',\n        'BATTING_ORDER_SUBMITTED',\n        'DEFENSIVE_ALIGNMENT_CHANGED',\n        'GAME_STARTED',\n        'HALF_INNING_STARTED',\n        'PITCH_RECORDED',\n        'BASE_RUNNING_RECORDED',\n        'PLATE_APPEARANCE_RESULTED',\n        'SUBSTITUTION_RECORDED',\n        'COURTESY_RUNNER_RECORDED',\n        'HALF_INNING_ENDED',\n        'GAME_CONCLUDED',\n        'GAME_FINALIZED',\n        'GAME_REOPENED',\n        'GAME_EVENT_VOIDED',\n        'GAME_EVENT_CORRECTED'\n      )",
+      "name": "game_events_type_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "game_events"
+    }
+  ],
+  "renames": []
+}
