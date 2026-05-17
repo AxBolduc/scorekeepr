@@ -27,7 +27,7 @@ function Home() {
     <main className="box-border min-h-screen bg-scorebook-paper px-6 py-16 text-scorebook-ink sm:px-10 lg:px-20">
       <section className="max-w-5xl rounded-3xl border-2 border-scorebook-green bg-scorebook-card p-6 shadow-[12px_12px_0_#1f3d24] sm:p-10 lg:p-12">
         <p className="mb-3 text-sm font-bold uppercase tracking-[0.08em] text-scorebook-gold">Scorekeepr</p>
-        <h1 className="max-w-3xl text-5xl font-black leading-[0.95] tracking-[-0.05em] sm:text-7xl lg:text-8xl">
+        <h1 className="max-w-3xl text-5xl font-black leading-[0.95] tracking-tighter sm:text-7xl lg:text-8xl">
           Traditional baseball scorekeeping, built for the web.
         </h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-scorebook-ink/85">
