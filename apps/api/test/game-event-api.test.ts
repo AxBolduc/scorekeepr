@@ -13,6 +13,7 @@ const validAppendRequest = {
     userId: "22222222-2222-4222-8222-222222222222",
     role: "scorekeeper",
   },
+  expectedLastRecordedSequence: 0,
   events: [
     {
       type: "PITCH_RECORDED",
@@ -133,5 +134,67 @@ test("client-assigned sequence fields are rejected", async () => {
   assert.equal(appendResponse.status, 400);
   assert.deepEqual(appendResponse.body, {
     error: "Clients must not assign Recorded Sequence or Effective Sequence",
+  });
+});
+
+test("user append requests require the expected last Recorded Sequence", async () => {
+  const api = createGameEventApi({
+    eventStore: createInMemoryGameEventStore(),
+  });
+
+  const appendResponse = await api.request(
+    "POST",
+    "/api/games/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/events",
+    {
+      ...validAppendRequest,
+      expectedLastRecordedSequence: undefined,
+    },
+  );
+
+  assert.equal(appendResponse.status, 400);
+  assert.deepEqual(appendResponse.body, {
+    error: "User append requests require expectedLastRecordedSequence",
+  });
+});
+
+test("stale user append requests are rejected before insertion and can be retried with the current Recorded Sequence", async () => {
+  const api = createGameEventApi({
+    eventStore: createInMemoryGameEventStore(),
+  });
+  const gamePath = "/api/games/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/events";
+
+  const firstAppendResponse = await api.request(
+    "POST",
+    gamePath,
+    validAppendRequest,
+  );
+  assert.equal(firstAppendResponse.status, 201);
+
+  const staleAppendResponse = await api.request("POST", gamePath, {
+    ...validAppendRequest,
+    commandId: "66666666-6666-4666-8666-666666666666",
+    expectedLastRecordedSequence: 0,
+  });
+
+  assert.equal(staleAppendResponse.status, 409);
+  assert.deepEqual(staleAppendResponse.body, {
+    error:
+      "Stale append request: expected last Recorded Sequence 0 but current is 1",
+  });
+
+  const readAfterStaleResponse = await api.request("GET", gamePath);
+  assert.equal(readAfterStaleResponse.body.events.length, 1);
+
+  const retryAppendResponse = await api.request("POST", gamePath, {
+    ...validAppendRequest,
+    commandId: "66666666-6666-4666-8666-666666666666",
+    expectedLastRecordedSequence: 1,
+  });
+
+  assert.equal(retryAppendResponse.status, 201);
+  assert.deepEqual(retryAppendResponse.body, {
+    commandId: "66666666-6666-4666-8666-666666666666",
+    firstRecordedSequence: 2,
+    lastRecordedSequence: 2,
   });
 });

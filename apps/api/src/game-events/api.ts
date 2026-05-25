@@ -14,6 +14,7 @@ type AppendGameEventRequest = {
     userId?: string;
     role?: string;
   };
+  expectedLastRecordedSequence?: number;
   events: Array<{
     type: GameEventType;
     payloadSchemaVersion?: number;
@@ -31,6 +32,7 @@ export type GameEventStore = {
     gameId: string;
     commandId: string;
     actor: AppendGameEventRequest["actor"];
+    expectedLastRecordedSequence?: number;
     events: AppendGameEventRequest["events"];
   }) => Promise<
     | {
@@ -48,9 +50,26 @@ export const createInMemoryGameEventStore = (): GameEventStore => {
   const eventsByGameId = new Map<string, StoredGameEvent[]>();
 
   return {
-    append: async ({ gameId, commandId, actor, events }) => {
+    append: async ({
+      gameId,
+      commandId,
+      actor,
+      expectedLastRecordedSequence,
+      events,
+    }) => {
       if (actor.type === "user" && actor.userId === undefined) {
         return { ok: false, status: 400, error: "User actor requires userId" };
+      }
+
+      if (
+        actor.type === "user" &&
+        typeof expectedLastRecordedSequence !== "number"
+      ) {
+        return {
+          ok: false,
+          status: 400,
+          error: "User append requests require expectedLastRecordedSequence",
+        };
       }
 
       if (events.length === 0) {
@@ -96,7 +115,20 @@ export const createInMemoryGameEventStore = (): GameEventStore => {
       }
 
       const gameEvents = eventsByGameId.get(gameId) ?? [];
-      const firstRecordedSequence = gameEvents.length + 1;
+      const currentLastRecordedSequence = gameEvents.length;
+
+      if (
+        actor.type === "user" &&
+        expectedLastRecordedSequence !== currentLastRecordedSequence
+      ) {
+        return {
+          ok: false,
+          status: 409,
+          error: `Stale append request: expected last Recorded Sequence ${expectedLastRecordedSequence} but current is ${currentLastRecordedSequence}`,
+        };
+      }
+
+      const firstRecordedSequence = currentLastRecordedSequence + 1;
       const recordedAt = new Date().toISOString();
 
       const storedEvents = validatedEvents.map(
@@ -150,6 +182,8 @@ const parseAppendRequest = (body: unknown): AppendGameEventRequest | null => {
     typeof request.actor !== "object" ||
     request.actor === null ||
     !["user", "system", "import"].includes(request.actor.type) ||
+    (request.expectedLastRecordedSequence !== undefined &&
+      typeof request.expectedLastRecordedSequence !== "number") ||
     !Array.isArray(request.events)
   ) {
     return null;
