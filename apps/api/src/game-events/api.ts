@@ -27,6 +27,12 @@ type ApiResponse = {
   body: unknown;
 };
 
+type CompletedCommandRange = {
+  commandId: string;
+  firstRecordedSequence: number;
+  lastRecordedSequence: number;
+};
+
 export type GameEventStore = {
   append: (input: {
     gameId: string;
@@ -48,6 +54,10 @@ export type GameEventStore = {
 
 export const createInMemoryGameEventStore = (): GameEventStore => {
   const eventsByGameId = new Map<string, StoredGameEvent[]>();
+  const commandsByGameId = new Map<
+    string,
+    Map<string, CompletedCommandRange>
+  >();
 
   return {
     append: async ({
@@ -57,6 +67,12 @@ export const createInMemoryGameEventStore = (): GameEventStore => {
       expectedLastRecordedSequence,
       events,
     }) => {
+      const completedCommand = commandsByGameId.get(gameId)?.get(commandId);
+
+      if (completedCommand !== undefined) {
+        return { ok: true, ...completedCommand };
+      }
+
       if (actor.type === "user" && actor.userId === undefined) {
         return { ok: false, status: 400, error: "User actor requires userId" };
       }
@@ -156,11 +172,21 @@ export const createInMemoryGameEventStore = (): GameEventStore => {
 
       eventsByGameId.set(gameId, [...gameEvents, ...storedEvents]);
 
-      return {
-        ok: true,
+      const completedCommands =
+        commandsByGameId.get(gameId) ??
+        new Map<string, CompletedCommandRange>();
+      const completedCommandRange = {
         commandId,
         firstRecordedSequence,
         lastRecordedSequence: firstRecordedSequence + storedEvents.length - 1,
+      };
+
+      completedCommands.set(commandId, completedCommandRange);
+      commandsByGameId.set(gameId, completedCommands);
+
+      return {
+        ok: true,
+        ...completedCommandRange,
       };
     },
     read: async (gameId) =>

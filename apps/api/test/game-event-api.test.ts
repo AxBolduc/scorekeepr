@@ -73,6 +73,58 @@ test("a client can append and read one validated Pitch Event", async () => {
   assert.match(readResponse.body.events[0].recordedAt, /^\d{4}-\d{2}-\d{2}T/);
 });
 
+test("one append command can persist multiple valid Game Events atomically", async () => {
+  const api = createGameEventApi({
+    eventStore: createInMemoryGameEventStore(),
+  });
+  const gamePath = "/api/games/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/events";
+
+  const appendResponse = await api.request("POST", gamePath, {
+    ...validAppendRequest,
+    events: [
+      validAppendRequest.events[0],
+      {
+        ...validAppendRequest.events[0],
+        payload: {
+          ...validAppendRequest.events[0].payload,
+          result: "ball",
+        },
+      },
+    ],
+  });
+
+  assert.equal(appendResponse.status, 201);
+  assert.deepEqual(appendResponse.body, {
+    commandId: validAppendRequest.commandId,
+    firstRecordedSequence: 1,
+    lastRecordedSequence: 2,
+  });
+
+  const readResponse = await api.request("GET", gamePath);
+
+  assert.equal(readResponse.status, 200);
+  assert.equal(readResponse.body.events.length, 2);
+  assert.deepEqual(
+    readResponse.body.events.map((event) => ({
+      commandId: event.commandId,
+      recordedSequence: event.recordedSequence,
+      effectiveSequence: event.effectiveSequence,
+    })),
+    [
+      {
+        commandId: validAppendRequest.commandId,
+        recordedSequence: 1,
+        effectiveSequence: 1,
+      },
+      {
+        commandId: validAppendRequest.commandId,
+        recordedSequence: 2,
+        effectiveSequence: 2,
+      },
+    ],
+  );
+});
+
 test("invalid Pitch Event payloads fail before insertion with a useful error", async () => {
   const api = createGameEventApi({
     eventStore: createInMemoryGameEventStore(),
@@ -107,6 +159,36 @@ test("invalid Pitch Event payloads fail before insertion with a useful error", a
     "GET",
     "/api/games/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/events",
   );
+
+  assert.deepEqual(readResponse.body, { events: [] });
+});
+
+test("a batch with any invalid Game Event persists no events", async () => {
+  const api = createGameEventApi({
+    eventStore: createInMemoryGameEventStore(),
+  });
+  const gamePath = "/api/games/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/events";
+
+  const appendResponse = await api.request("POST", gamePath, {
+    ...validAppendRequest,
+    events: [
+      validAppendRequest.events[0],
+      {
+        ...validAppendRequest.events[0],
+        payload: {
+          ...validAppendRequest.events[0].payload,
+          result: "not_a_pitch_result",
+        },
+      },
+    ],
+  });
+
+  assert.equal(appendResponse.status, 400);
+  assert.deepEqual(appendResponse.body, {
+    error: "Invalid PITCH_RECORDED payload",
+  });
+
+  const readResponse = await api.request("GET", gamePath);
 
   assert.deepEqual(readResponse.body, { events: [] });
 });
@@ -197,4 +279,45 @@ test("stale user append requests are rejected before insertion and can be retrie
     firstRecordedSequence: 2,
     lastRecordedSequence: 2,
   });
+});
+
+test("retrying a completed command returns the existing sequence range without duplicating events", async () => {
+  const api = createGameEventApi({
+    eventStore: createInMemoryGameEventStore(),
+  });
+  const gamePath = "/api/games/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/events";
+  const request = {
+    ...validAppendRequest,
+    events: [
+      validAppendRequest.events[0],
+      {
+        ...validAppendRequest.events[0],
+        payload: {
+          ...validAppendRequest.events[0].payload,
+          result: "ball",
+        },
+      },
+    ],
+  };
+
+  const appendResponse = await api.request("POST", gamePath, request);
+  assert.equal(appendResponse.status, 201);
+  assert.deepEqual(appendResponse.body, {
+    commandId: validAppendRequest.commandId,
+    firstRecordedSequence: 1,
+    lastRecordedSequence: 2,
+  });
+
+  const retryResponse = await api.request("POST", gamePath, request);
+
+  assert.equal(retryResponse.status, 201);
+  assert.deepEqual(retryResponse.body, {
+    commandId: validAppendRequest.commandId,
+    firstRecordedSequence: 1,
+    lastRecordedSequence: 2,
+  });
+
+  const readResponse = await api.request("GET", gamePath);
+
+  assert.equal(readResponse.body.events.length, 2);
 });
